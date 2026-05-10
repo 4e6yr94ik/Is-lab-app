@@ -10,7 +10,6 @@ jobs:
   deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
@@ -18,9 +17,21 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: false
           script: |
+            set -e
+            echo "===== Logging in to GHCR ====="
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USER }} --password-stdin
+            
+            echo "===== Pulling new image ====="
             cd /home/deployer/deploy/is-stack
-            docker compose pull app
-            docker compose up -d app
+            docker compose -f docker-compose.yml pull app
+            
+            echo "===== Restarting container ====="
+            docker compose -f docker-compose.yml up -d --force-recreate app
+            
+            echo "===== Cleanup old images ====="
             docker image prune -f
+            
+            echo "===== Checking status ====="
+            docker ps --filter name=isapp --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
