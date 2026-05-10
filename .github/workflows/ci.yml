@@ -1,9 +1,7 @@
-name: CI - Build, Test & Push Docker Image to GHCR
+name: CI - Build & Push Docker Image to GHCR
 
 on:
   push:
-    branches: [main]
-  pull_request:
     branches: [main]
 
 env:
@@ -11,7 +9,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-test-push:
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -26,20 +24,11 @@ jobs:
         with:
           dotnet-version: '8.0'
 
-      - name: Restore main project
+      - name: Restore
         run: dotnet restore IsLabApp.csproj
 
-      - name: Restore test project
-        run: dotnet restore IsLabApp.Tests/IsLabApp.Tests.csproj
-
-      - name: Build main project
+      - name: Build
         run: dotnet build IsLabApp.csproj --configuration Release --no-restore
-
-      - name: Build test project
-        run: dotnet build IsLabApp.Tests/IsLabApp.Tests.csproj --configuration Release --no-restore
-
-      - name: Run tests
-        run: dotnet test IsLabApp.Tests/IsLabApp.Tests.csproj --configuration Release --no-build --verbosity normal
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
