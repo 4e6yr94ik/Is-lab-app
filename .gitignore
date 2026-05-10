@@ -1,0 +1,15 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.userprefs
+.vs/
+*.DotSettings.user
+
+## Visual Studio Code
+.vscode/
+
+## Rider
+.idea/
