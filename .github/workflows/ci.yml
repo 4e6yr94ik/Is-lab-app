@@ -26,14 +26,20 @@ jobs:
         with:
           dotnet-version: '8.0'
 
-      - name: Restore dependencies
+      - name: Restore main project
         run: dotnet restore IsLabApp.csproj
 
-      - name: Build
+      - name: Restore test project
+        run: dotnet restore IsLabApp.Tests/IsLabApp.Tests.csproj
+
+      - name: Build main project
         run: dotnet build IsLabApp.csproj --configuration Release --no-restore
 
-      - name: Test
-        run: dotnet test IsLabApp.Tests/IsLabApp.Tests.csproj --configuration Release --verbosity normal
+      - name: Build test project
+        run: dotnet build IsLabApp.Tests/IsLabApp.Tests.csproj --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test IsLabApp.Tests/IsLabApp.Tests.csproj --configuration Release --no-build --verbosity normal
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
