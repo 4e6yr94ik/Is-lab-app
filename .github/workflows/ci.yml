@@ -27,7 +27,7 @@ jobs:
       - name: Restore
         run: dotnet restore IsLabApp.csproj
 
-      - name: Build
+      - name: Build (main project only)
         run: dotnet build IsLabApp.csproj --configuration Release --no-restore
 
       - name: Log in to GitHub Container Registry
